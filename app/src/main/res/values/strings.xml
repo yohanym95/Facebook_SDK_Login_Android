@@ -2,5 +2,10 @@
     <string name="app_name">Dev Circles Workshop</string>
     <string name="facebook_app_id">293778124775683</string>
     <string name="fb_login_protocol_scheme">fb293778124775683</string>
+    <string name="ACCOUNT_KIT_CLIENT_TOKEN">[ACCOUNT_KIT_CLIENT_TOKEN]</string>
+
+    // if your Facebook App ID is 1234567, you should use ak1234567
+    <string name="ak_login_protocol_scheme">akFACEBOOK_APP_ID</string>
+
 
 </resources>
