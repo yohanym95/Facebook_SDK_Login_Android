@@ -50,13 +50,13 @@ public class MainActivity extends AppCompatActivity {
         btnEmail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                emailLogin();
             }
         });
         btnMobile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                phoneLogin();
             }
         });
 
@@ -76,6 +76,30 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 // App code
+                String account_id = loginResult.getAccessToken().getApplicationId();
+
+                GraphRequest request = GraphRequest.newMeRequest(
+                        loginResult.getAccessToken(),
+                        new GraphRequest.GraphJSONObjectCallback() {
+                            @Override
+                            public void onCompleted(JSONObject object, GraphResponse response) {
+                                // Insert your code here
+                                try {
+
+                                    username = object.getString("name");
+                                    picture = object.getJSONObject("picture").getJSONObject("data").getString("url");
+
+                                    loginRedirect();
+
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                Bundle parameters = new Bundle();
+                parameters.putString("fields", "id,name,picture");
+                request.setParameters(parameters);
+                request.executeAsync();
 
             }
 
