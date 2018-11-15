@@ -33,11 +33,13 @@ import org.json.JSONObject;
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
-    int APP_REQUEST_CODE = 99;
+    public static int APP_REQUEST_CODE = 99;
     Button btnEmail, btnMobile;
     String username, picture;
     LoginButton loginButton;
     CallbackManager callbackManager;
+    private static final String EMAIL = "email";
+    private static final String PUBLIC_PROFILE = "public_profile";
 
 
     @Override
@@ -60,14 +62,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        FacebookSdk.sdkInitialize(getApplicationContext());
-        AppEventsLogger.activateApp(this);
+      //  FacebookSdk.sdkInitialize(getApplicationContext());
+        //AppEventsLogger.activateApp(this);
 
-        final CallbackManager callbackManager = CallbackManager.Factory.create();
+        callbackManager = CallbackManager.Factory.create();
 
-        final String EMAIL = "email";
 
-        loginButton = (LoginButton) findViewById(R.id.login_button);
+        loginButton = findViewById(R.id.login_button);
         loginButton.setReadPermissions(Arrays.asList(EMAIL));
         // If you are using in a fragment, call loginButton.setFragment(this);
 
@@ -76,31 +77,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 // App code
-                String account_id = loginResult.getAccessToken().getApplicationId();
-
-                GraphRequest request = GraphRequest.newMeRequest(
-                        loginResult.getAccessToken(),
-                        new GraphRequest.GraphJSONObjectCallback() {
-                            @Override
-                            public void onCompleted(JSONObject object, GraphResponse response) {
-                                // Insert your code here
-                                try {
-
-                                    username = object.getString("name");
-                                    picture = object.getJSONObject("picture").getJSONObject("data").getString("url");
-
-                                    loginRedirect();
-
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
-                Bundle parameters = new Bundle();
-                parameters.putString("fields", "id,name,picture");
-                request.setParameters(parameters);
-                request.executeAsync();
-
             }
 
             @Override
@@ -114,42 +90,17 @@ public class MainActivity extends AppCompatActivity {
             }
 
 
-
-
-
         });
 
-      /*  LoginManager.getInstance().registerCallback(callbackManager,
+        callbackManager = CallbackManager.Factory.create();
+
+        LoginManager.getInstance().registerCallback(callbackManager,
                 new FacebookCallback<LoginResult>() {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
                         // App code
 
-                        String account_id = loginResult.getAccessToken().getApplicationId();
-
-                        GraphRequest request = GraphRequest.newMeRequest(
-                                loginResult.getAccessToken(),
-                                new GraphRequest.GraphJSONObjectCallback() {
-                                    @Override
-                                    public void onCompleted(JSONObject object, GraphResponse response) {
-                                        // Insert your code here
-                                        try {
-
-                                            username = object.getString("name");
-                                            picture = object.getJSONObject("picture").getJSONObject("data").getString("url");
-
-                                            loginRedirect();
-
-                                        } catch (JSONException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                });
-
-                        Bundle parameters = new Bundle();
-                        parameters.putString("fields", "id,name,picture");
-                        request.setParameters(parameters);
-                        request.executeAsync();
+                        loginRedirect();
 
                     }
 
@@ -162,24 +113,24 @@ public class MainActivity extends AppCompatActivity {
                     public void onError(FacebookException exception) {
                         // App code
                     }
-                }); */
+                });
 
 
+    }
 
 
-
-        com.facebook.accountkit.AccessToken  accessToken = AccountKit.getCurrentAccessToken();
+      /*  com.facebook.accountkit.AccessToken  accessToken = AccountKit.getCurrentAccessToken();
        // boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
         if (accessToken != null) {
             //Handle Returning User
         } else {
             //Handle new or logged out user
             AccountKit.logOut();
-        }
+        } */
 
 
 
-        LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile"));
+      //  LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile"));
 
 
 
@@ -192,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         
-    }
+
 
    // @Override
    /* protected void onActivityResult(final int requestCode,final int resultCode,final Intent data){
@@ -239,17 +190,20 @@ public class MainActivity extends AppCompatActivity {
             final int requestCode,
             final int resultCode,
             final Intent data) {
+        callbackManager.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == APP_REQUEST_CODE) { // confirm that this response matches your request
             AccountKitLoginResult loginResult = data.getParcelableExtra(AccountKitLoginResult.RESULT_KEY);
             String toastMessage;
             if (loginResult.getError() != null) {
                 toastMessage = loginResult.getError().getErrorType().getMessage();
+
                 Toast.makeText(
                         this,
                         loginResult.getError().toString(),
                         Toast.LENGTH_LONG)
                         .show();
+
             } else if (loginResult.wasCancelled()) {
                 toastMessage = "Login Cancelled";
             } else {
@@ -258,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     toastMessage = String.format(
                             "Success:%s...",
-                            loginResult.getAuthorizationCode().substring(0,10));
+                            loginResult.getAuthorizationCode().substring(0, 10));
                 }
 
                 // If you have an authorization code, retrieve it from
@@ -267,6 +221,7 @@ public class MainActivity extends AppCompatActivity {
 
                 // Success! Start your next activity...
                 loginRedirect();
+
             }
 
             // Surface the result to your user in an appropriate way.
@@ -276,6 +231,7 @@ public class MainActivity extends AppCompatActivity {
                     Toast.LENGTH_LONG)
                     .show();
         }
+
     }
 
 
@@ -284,15 +240,6 @@ public class MainActivity extends AppCompatActivity {
     //Begin add interest activity
     private void loginRedirect() {
         Intent i = new Intent(MainActivity.this, AddInterests.class);
-
-        if(username != null){
-            i.putExtra("username",username);
-        }
-
-        if(picture != null){
-            i.putExtra("picture",picture);
-        }
-
         startActivity(i);
         finish();
     }

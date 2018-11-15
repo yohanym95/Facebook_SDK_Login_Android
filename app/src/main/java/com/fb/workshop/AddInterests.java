@@ -7,15 +7,20 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.facebook.appevents.AppEventsConstants;
+import com.facebook.appevents.AppEventsLogger;
 import com.fb.workshop.newsfeed.NewsActivity;
 import com.robertlevonyan.views.chip.Chip;
 import com.squareup.picasso.Picasso;
+
+import java.util.logging.Logger;
 
 public class AddInterests extends AppCompatActivity {
 
     Chip tech, business, politics, enter, bit, ai, music, holly, bolly, block;
     TextView username;
     ImageView picture;
+    AppEventsLogger logger;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,18 +110,8 @@ public class AddInterests extends AppCompatActivity {
                 passInterest("blockchain");
             }
         });
+        logger = AppEventsLogger.newLogger(AddInterests.this);
 
-        Intent intent = getIntent();
-        String d_username = intent.getStringExtra("username");
-        String d_picture = intent.getStringExtra("picture");
-
-        if (d_username != null) {
-            username.setText("Welcome, " + d_username);
-        }
-
-        if (d_picture != null) {
-            Picasso.with(AddInterests.this).load(d_picture).placeholder(R.drawable.userdummy).into(picture);
-        }
 
     }
 
@@ -124,6 +119,11 @@ public class AddInterests extends AppCompatActivity {
 
         //Log to FB Analytics here
         //Facebook Analytics
+        Bundle parameters = new Bundle();
+        parameters.putString(AppEventsConstants.EVENT_PARAM_CONTENT, interest);
+        logger.logEvent("Added interest", parameters);
+
+
 
         //Start the news activity
         Intent i = new Intent(AddInterests.this, NewsActivity.class);
